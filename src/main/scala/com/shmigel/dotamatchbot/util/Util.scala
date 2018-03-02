@@ -1,12 +1,12 @@
 package com.shmigel.dotamatchbot.util
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Paths}
 
+import com.shmigel.dotamatchbot.util.Implicit._
 import org.joda.time.LocalDateTime
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.joda.time.format.DateTimeFormatter
+
 import scala.io.Source
 
 object Util {
@@ -14,14 +14,6 @@ object Util {
   def TextFormatting = new TextFormatting()
 
   def Const = new Const()
-
-  def Implicit = new Implicit()
-
-  class Implicit {
-    implicit val dotaMatchPage: Document = Jsoup.connect("https://cybersportscore.com/en/dota-2").get()
-
-    implicit val baseFormatter: DateTimeFormatter = DateTimeFormat.forPattern("HH:mmyyyy-MM-dd")
-  }
 
   class TextFormatting {
 

@@ -1,97 +1,70 @@
 package com.shmigel.dotamatchbot.matchLoader
 
 import com.shmigel.dotamatchbot.model._
-
-import collection.JavaConverters._
+import com.shmigel.dotamatchbot.util.Implicit._
 import com.shmigel.dotamatchbot.util.Util.TextFormatting
 import org.jsoup.nodes.{Document, Element}
-import org.joda.time.LocalDateTime
-import org.joda.time.LocalDateTime.now
+
+import scala.collection.JavaConverters._
 
 object PageProcessing {
 
-  def isToday(date: LocalDateTime): Boolean = date.getDayOfMonth == now.getDayOfMonth
-
-  /*
-    TODO: Complete all method
-    TODO: String => Match
-    TODO: Write tests
-    TODO: Add score to all type of match
-  */
-  def getLiveMatches(implicit document: Document): Option[List[Match]] = {
-
-    val liveEvents = document.select(".live-event").asScala
+  def getLiveMatches(implicit document: Document): List[Match.Live] = {
+    val liveEvents = document.select(".event-live").asScala
 
     val liveMatches = for {
       event <- liveEvents
-      direName = event.select(".teams").select("em").last.text
-      radiantName = event.select(".teams").select("em").first.text
-      tournament = event.select(".tournament").select("a").attr("title")
-      bo = event.select(".bo").text
-      date = TextFormatting.dataFormatter(TextFormatting.customTrim(event.select(".date").text))
+      info = getMatchInfo(event)
       direStat = getGameStatistic(event.selectFirst(".scores .team-home"))
       radiantStat = getGameStatistic(event.selectFirst(".scores .team-away"))
-    }yield LiveMatch(Team(direName), Team(radiantName), Tournament(tournament), BO(bo), date,
-      direStat, radiantStat)
+    }yield Match.Live(info, direStat, radiantStat)
 
-    Some(getTodayMatch(liveMatches.toList).getOrElse(List.empty))
+    liveMatches.toList
   }
 
-  def getUpcomingMatches(implicit document: Document): Option[List[Match]] = {
-
+  def getUpcomingMatches(implicit document: Document): List[Match.Upcoming] = {
     val upcomingEvents = document.
       select(".event_list:not(.event_list_ended) .event:not(.event-live)").asScala
 
     val upcomingMatches = for {
       event <- upcomingEvents
-      direName = event.select(".teams").select("em").last.text
-      radiantName = event.select(".teams").select("em").first.text
-      tournament = event.select(".tournament").select("a").attr("title")
-      bo = event.select(".bo").text
-      date = TextFormatting.dataFormatter(TextFormatting.customTrim(event.select(".date").text))
-    }yield UpcomingMatch(Team(direName), Team(radiantName), Tournament(tournament), BO(bo), date)
+      info = getMatchInfo(event)
+    }yield Match.Upcoming(info)
 
-    Some(getTodayMatch(upcomingMatches.toList).getOrElse(List.empty))
+    upcomingMatches.toList
   }
 
-  def getFinishedMatches(implicit document: Document): Option[List[Match]] = {
-
+  def getFinishedMatches(implicit document: Document): List[Match.Finished] = {
     val finishedEvents = document.select(".event_list_ended .event").asScala
 
     val finishedMatches = for {
       event <- finishedEvents
-      direName = event.select(".teams").select("em").last.text
-      radiantName = event.select(".teams").select("em").first.text
-      tournament = event.select(".tournament").select("a").attr("title")
-      bo = event.select(".bo").text
-      date = TextFormatting.dataFormatter(TextFormatting.customTrim(event.select(".date").text))
+      info = getMatchInfo(event)
       direScore = event.select(".scores .team-away").text
       radiantScore = event.select(".scores .team-home").text
-    }yield FinishedMatch(Team(direName), Team(radiantName), Tournament(tournament), BO(bo), date,
-      direScore.toInt, radiantScore.toInt)
+    }yield Match.Finished(info, direScore, radiantScore)
 
-    Some(getTodayMatch(finishedMatches.toList).getOrElse(List.empty))
+    finishedMatches.toList
   }
 
-  def getMatchInfo() = ???
+  def getMatchInfo(element: Element): Match.Info = {
+    val direName = element.select(".teams").select("em").last.text
+    val radiantName = element.select(".teams").select("em").first.text
+    val tournament = element.select(".tournament").select("a").attr("title")
+    val bo = element.select(".bo").text
+    val date = TextFormatting.dataFormatter(TextFormatting.customTrim(element.select(".date").text))
 
-  def getMatchStatistic(element: Element) = ???
+    Match.Info(Team(direName), Team(radiantName), Tournament(tournament), BO(bo), date)
+  }
 
   def getGameStatistic(element: Element): LiveTeamStatistic = {
-
-    val score = element.select(".team-score").text.toInt
-    val kills = element.select(".kills tip").text.toInt
-    val networs = element.select(".net tip").text.toInt
-    val tower = element.select(".towers tip").text.toInt
-    val barraks = element.select(".star tip").text.toInt
+    val score = element.select(".main-score").text
+    val kills = element.select(".kills").text
+    val networs = element.select(".net").text
+    val tower = element.select(".towers").text
+    val barraks = element.select(".star").text
 
     LiveTeamStatistic(score, kills, networs, tower, barraks)
   }
 
-  def getTodayMatch(dMatch: List[Match]): Option[List[Match]] = {
-    dMatch.isEmpty match {
-      case false => Some(dMatch.filter(i => isToday(i.date)))
-      case true => None
-    }
-  }
 }

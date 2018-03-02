@@ -23,47 +23,30 @@ case class Tournament(name: String)
 
 case class Team(name: String)
 
-case class LiveTeamStatistic(score: Int,
-                             kills: Int,
-                             netWorth: Int,
-                             tDestroyed: Int,
-                             bDestroyed: Int)
+case class LiveTeamStatistic(score: String,
+                             kills: String,
+                             netWorth: String,
+                             tDestroyed: String,
+                             bDestroyed: String)
 
+object Match {
 
-//TODO: Rewrite hashcode or delegate to Match
-abstract class Match {
-  def id: Int = hashCode
-  def dire: Team
-  def radiant: Team
-  def bo: BO
-  def date: LocalDateTime
-}
+  case class Info(dire: Team,
+                  radiant: Team,
+                  tournament: Tournament,
+                  bo: BO,
+                  date: LocalDateTime) {
+    val id: Int = hashCode
+  }
 
-case class UpcomingMatch(dire: Team,
-                         radiant: Team,
-                         tournament: Tournament,
-                         bo: BO,
-                         date: LocalDateTime) extends Match {
-  override def hashCode(): Int = (dire.name.hashCode + radiant.hashCode).hashCode
-}
+  case class Upcoming(matchInfo: Info)
 
-case class LiveMatch(dire: Team,
-                     radiant: Team,
-                     tournament: Tournament,
-                     bo: BO,
-                     date: LocalDateTime,
-                     direStatistic: LiveTeamStatistic,
-                     radiantStatistic: LiveTeamStatistic) extends Match {
-  override def hashCode(): Int = (dire.name.hashCode + radiant.hashCode).hashCode
-}
+  case class Live(matchInfo: Info,
+                  direStatistic: LiveTeamStatistic,
+                  radiantStatistic: LiveTeamStatistic)
 
-case class FinishedMatch(dire: Team,
-                         radiant: Team,
-                         tournament: Tournament,
-                         bo: BO,
-                         date: LocalDateTime,
-                         radiantScore: Int,
-                         direScore: Int
-                        ) extends Match {
-  override def hashCode(): Int = (dire.name.hashCode + radiant.hashCode).hashCode
+  case class Finished(matchInfo: Info,
+                      radiantScore: String,
+                      direScore: String)
+
 }
