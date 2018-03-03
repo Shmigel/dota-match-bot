@@ -2,7 +2,7 @@ package com.shmigel.dotamatchbot.service
 
 /**
   *
-  * Designed to dependences between Match object id and message id some messager
+  * Designed to dependencies between Match object id and message id some messager
   *
   */
 
