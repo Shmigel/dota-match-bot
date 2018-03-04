@@ -1,26 +1,29 @@
 package com.shmigel.dotamatchbot.service.telegram
 
-import com.shmigel.dotamatchbot.service.Service
+import com.shmigel.dotamatchbot.model.Match.{Finished, Live, Match, Upcoming}
 
-import scala.collection.mutable
+object TelegramService {
 
-object TelegramService extends Service{
+  def sendMessage(dMatch: Match): Option[Boolean] = {
+    dMatch match {
+      case dMatch: Upcoming =>
+        TelegramApi.sendMessage(dMatch) match {
+          case Some(id) => Some(TelegramBindService.addDependences(dMatch.id, id))
+          case None => None
+        }
 
-  private val idDependences = mutable.HashMap.empty[Int, Int]
+      case dMatch: Live =>
+        TelegramApi.sendMessage(dMatch) match {
+          case Some(id) => Some(TelegramBindService.addDependences(dMatch.id, id))
+          case None => None
+        }
 
-  def getMessageId(matchId: Int): Option[Int] =
-    idDependences.get(matchId)
-
-  def addDependences(matchId: Int, messageId: Int): Boolean =
-    idDependences.put(matchId, messageId) match {
-      case None    => false
-      case Some(_) => true
+      case dMatch: Finished =>
+        TelegramApi.sendMessage(dMatch) match {
+          case Some(id) => Some(TelegramBindService.removeDependences(dMatch.id))
+          case None => None
+        }
     }
-
-  def removeDependences(matchId: Int): Boolean =
-    idDependences.remove(matchId) match {
-      case Some(_) => true
-      case None => false
-    }
+  }
 
 }

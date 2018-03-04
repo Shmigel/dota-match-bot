@@ -28,7 +28,9 @@ object Util {
 
     def token: String = "450924088:AAF-x-8pY5YJYVV6ccnDYjfp1AHGN6wKNZ4"
 
-    def chat_id: String = "@dotamatch"
+    def group_chat_id: String = "@dotamatch"
+
+
 
     def lastMessageId: Option[Int] =
       Option(Source.fromFile("last_message_id").mkString.toInt)

@@ -31,22 +31,27 @@ case class LiveTeamStatistic(score: String,
 
 object Match {
 
+  abstract class Match {
+    val id: Int = info.hashCode()
+    val info: Info
+  }
+
   case class Info(dire: Team,
                   radiant: Team,
                   tournament: Tournament,
                   bo: BO,
                   date: LocalDateTime) {
-    val id: Int = hashCode
+    override def hashCode(): Int = dire.hashCode() + radiant.hashCode()
   }
 
-  case class Upcoming(matchInfo: Info)
+  case class Upcoming(info: Info) extends Match
 
-  case class Live(matchInfo: Info,
+  case class Live(info: Info,
                   direStatistic: LiveTeamStatistic,
-                  radiantStatistic: LiveTeamStatistic)
+                  radiantStatistic: LiveTeamStatistic) extends Match
 
-  case class Finished(matchInfo: Info,
+  case class Finished(info: Info,
                       radiantScore: String,
-                      direScore: String)
+                      direScore: String) extends Match
 
 }
