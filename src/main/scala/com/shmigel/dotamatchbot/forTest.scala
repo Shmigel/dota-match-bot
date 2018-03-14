@@ -14,11 +14,11 @@ class forTest extends Runnable {
       val live = PageProcessing.getLiveMatches
       val finish = PageProcessing.getFinishedMatches
 
-      up foreach TelegramService.sendMessage
+      up foreach TelegramService.sendMatchMessage
 
-      live foreach TelegramService.sendMessage
+      live foreach TelegramService.sendMatchMessage
 
-      finish foreach TelegramService.sendMessage
+      finish foreach TelegramService.sendMatchMessage
 
       println(TelegramBindService.idDependences)
 

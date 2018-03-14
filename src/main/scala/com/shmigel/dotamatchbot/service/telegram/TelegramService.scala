@@ -1,29 +1,37 @@
 package com.shmigel.dotamatchbot.service.telegram
 
 import com.shmigel.dotamatchbot.model.Match.{Finished, Live, Match, Upcoming}
+import com.shmigel.dotamatchbot.service.telegram.TelegramApi._
+import com.shmigel.dotamatchbot.service.telegram.TelegramBindService._
 
+/**
+  * Provide full control of telegram message sending
+  */
 object TelegramService {
 
-  def sendMessage(dMatch: Match): Option[Boolean] = {
+  def sendMatchMessage(dMatch: Match): Unit = {
+
     dMatch match {
+
       case dMatch: Upcoming =>
-        TelegramApi.sendMessage(dMatch) match {
-          case Some(id) => Some(TelegramBindService.addDependences(dMatch.id, id))
-          case None => None
+        getMessageId(dMatch.id) match {
+          case Some(id) => None
+          case None => val messageId = sendMessage(dMatch)
+            addDependences(dMatch.id, messageId)
         }
 
       case dMatch: Live =>
-        TelegramApi.sendMessage(dMatch) match {
-          case Some(id) => Some(TelegramBindService.addDependences(dMatch.id, id))
+        getMessageId(dMatch.id) match {
+          case Some(id) => editMessage(dMatch, id)
           case None => None
         }
 
       case dMatch: Finished =>
-        TelegramApi.sendMessage(dMatch) match {
-          case Some(id) => Some(TelegramBindService.removeDependences(dMatch.id))
+        getMessageId(dMatch.id) match {
+          case Some(id) => editMessage(dMatch, id); removeDependences(dMatch.id)
           case None => None
         }
+
     }
   }
-
 }

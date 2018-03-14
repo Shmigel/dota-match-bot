@@ -1,8 +1,7 @@
 package com.shmigel.dotamatchbot.service
 
 /**
-  * Designed to dependencies between Match object id and message id some messager
-  * Provide methods to control dependencies
+  * Designed to dependencies between Match object id and message id
   */
 
 trait BindService {
