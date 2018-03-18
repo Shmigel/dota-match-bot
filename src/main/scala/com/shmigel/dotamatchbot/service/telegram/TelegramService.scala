@@ -3,11 +3,14 @@ package com.shmigel.dotamatchbot.service.telegram
 import com.shmigel.dotamatchbot.model.Match.{Finished, Live, Match, Upcoming}
 import com.shmigel.dotamatchbot.service.telegram.TelegramApi._
 import com.shmigel.dotamatchbot.service.telegram.TelegramBindService._
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Provide full control of telegram message sending
   */
 object TelegramService {
+
+  val logger: Logger = LoggerFactory.getLogger(TelegramService.getClass)
 
   def sendMatchMessage(dMatch: Match): Unit = {
 
@@ -23,7 +26,8 @@ object TelegramService {
       case dMatch: Live =>
         getMessageId(dMatch.id) match {
           case Some(id) => editMessage(dMatch, id)
-          case None => None
+          case None => val messageId = sendMessage(dMatch)
+            addDependences(dMatch.id, messageId)
         }
 
       case dMatch: Finished =>

@@ -1,10 +1,8 @@
 package com.shmigel.dotamatchbot.service.telegram
 
-import com.shmigel.dotamatchbot.service.BindService
-
 import scala.collection.mutable
 
-object TelegramBindService extends BindService{
+object TelegramBindService {
 
   val idDependences = mutable.HashMap.empty[Int, Int]
 

@@ -4,12 +4,16 @@ import com.shmigel.dotamatchbot.model._
 import com.shmigel.dotamatchbot.util.Implicit._
 import com.shmigel.dotamatchbot.util.Util.TextFormatting
 import org.jsoup.nodes.{Document, Element}
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
 object PageProcessing {
+  val logger: Logger = LoggerFactory.getLogger(PageProcessing.getClass)
 
   def getLiveMatches(implicit document: Document): List[Match.Live] = {
+    logger.info("Processing match page to get live matches")
+
     val liveEvents = document.select(".event-live").asScala
 
     val liveMatches = for {
@@ -23,6 +27,8 @@ object PageProcessing {
   }
 
   def getUpcomingMatches(implicit document: Document): List[Match.Upcoming] = {
+    logger.info("Processing match page to get upcoming matches")
+
     val upcomingEvents = document.
       select(".event_list:not(.event_list_ended) .event:not(.event-live)").asScala
 
@@ -35,6 +41,8 @@ object PageProcessing {
   }
 
   def getFinishedMatches(implicit document: Document): List[Match.Finished] = {
+    logger.info("Processing match page to get finished matches")
+
     val finishedEvents = document.select(".event_list_ended .event").asScala
 
     val finishedMatches = for {
@@ -47,7 +55,7 @@ object PageProcessing {
     finishedMatches.toList
   }
 
-  def getMatchInfo(element: Element): Match.Info = {
+  private def getMatchInfo(element: Element): Match.Info = {
     val direName = element.select(".teams").select("em").last.text
     val radiantName = element.select(".teams").select("em").first.text
     val tournament = element.select(".tournament").select("a").attr("title")
@@ -57,7 +65,7 @@ object PageProcessing {
     Match.Info(Team(direName), Team(radiantName), Tournament(tournament), BO(bo), date)
   }
 
-  def getGameStatistic(element: Element): LiveTeamStatistic = {
+  private def getGameStatistic(element: Element): LiveTeamStatistic = {
     val score = element.select(".main-score").text
     val kills = element.select(".kills").text
     val networs = element.select(".net").text
