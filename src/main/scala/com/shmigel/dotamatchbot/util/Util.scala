@@ -21,10 +21,10 @@ object Util {
 
   class Const {
 
-    def token: String = "450924088:AAF-x-8pY5YJYVV6ccnDYjfp1AHGN6wKNZ4"
+    def token: String = ???
 
-    private def groupChatId: String = "@dotamatch"
-    private def botChatId: String = "299248086"
+    private def groupChatId: String = ???
+    private def botChatId: String = ???
 
     def group_chat_id(): String = groupChatId
   }
